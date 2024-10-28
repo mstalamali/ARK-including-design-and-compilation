@@ -20,13 +20,13 @@ Install ARK as described in the [original version](https://github.com/DiODeProje
 
 ## Run  
 
---Run ARK as described in the [original version](https://github.com/DiODeProject/KilobotArena). 
+-Run ARK as described in the [original version](https://github.com/DiODeProject/KilobotArena). 
 
---To design a swarm controller from ARK:
+-To design a swarm controller from ARK:
 - Press the **Design Controller** button from the **Controller** tab in the ARK UI. This will ask you to select a folder of where the controller files will be stored. 
 - Once you select a folder,  the Nadzuro2 software will open providing you with an external UI to graphically design the controller. 
 - Once you finish designing the controller, make sure it is saved into the folder selected earlier.
 
---To compile the designed controller, press the **Compile Controller** button from the **Controller** tab in the ARK UI. A pop up message will let you know if the compilation was successfull or not. In case, of compilation errors, you will get these from within Qt Creator error logs.
+-To compile the designed controller, press the **Compile Controller** button from the **Controller** tab in the ARK UI. A pop up message will let you know if the compilation was successfull or not. In case, of compilation errors, you will get these from within Qt Creator error logs.
 
---To upload the compiled code, press the **Upload Controller** button from the **Controller** tab in the ARK UI. This will upload the controller binary to the robots present in the ARK arena.
+-To upload the compiled code, press the **Upload Controller** button from the **Controller** tab in the ARK UI. This will upload the controller binary to the robots present in the ARK arena.
