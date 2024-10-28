@@ -95,8 +95,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ohc_run, SIGNAL(toggled(bool)), &this->ohc, SLOT(runKilobots()));
     connect(ui->ohc_stop, SIGNAL(toggled(bool)), &this->ohc, SLOT(stopSending()));
     connect(ui->ohc_volt, SIGNAL(toggled(bool)), &this->ohc, SLOT(checkVoltage()));
-    connect(ui->ohc_set_prog, SIGNAL(clicked(bool)), &this->ohc, SLOT(chooseProgramFile()));
     connect(ui->ohc_upload_prog, SIGNAL(clicked(bool)), &this->ohc, SLOT(uploadProgram()));
+
+    connect(ui->ohc_design_controller, SIGNAL(clicked(bool)), &this->ohc, SLOT(designController()));
+    connect(ui->ohc_compile_controller, SIGNAL(clicked(bool)), &this->ohc, SLOT(compileController()));
 
     // from OHC
     connect(&this->ohc,SIGNAL(setStopButton(bool)),ui->ohc_stop,SLOT(setChecked(bool)));

@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QDebug>
+#include <cstdlib>
 
 
 // OHC data structures & defs
@@ -199,15 +200,15 @@ void KilobotOverheadController::serialUpdateStatus(QString str)
 void KilobotOverheadController::updateStatus()
 {
     QString str = serial_status;
-     if (str.startsWith("connect")) {
-         connected = true;
-         emit errorMessage("OHC connected");
-         // enable stuff for when connected
-     } else {
-         connected = false;
-         // disable stuff for when not connected
-         emit errorMessage("OHC disconnected");
-     }
+    if (str.startsWith("connect")) {
+        connected = true;
+        emit errorMessage("OHC connected");
+        // enable stuff for when connected
+    } else {
+        connected = false;
+        // disable stuff for when not connected
+        emit errorMessage("OHC disconnected");
+    }
 }
 
 void KilobotOverheadController::toggleConnection() {
@@ -222,7 +223,7 @@ void KilobotOverheadController::toggleConnection() {
 }
 
 void KilobotOverheadController::stopSending() {
-   sendMessage(COMMAND_STOP);
+    sendMessage(COMMAND_STOP);
 }
 
 void KilobotOverheadController::sendMessage(int type_int) {
@@ -261,7 +262,7 @@ void KilobotOverheadController::sendMessage(int type_int) {
 void KilobotOverheadController::sendDataMessage(uint8_t *payload, uint8_t type) {
     //if (sending) {
     emit setStopButton(true);
-        //stopSending();
+    //stopSending();
     //}
 
     QByteArray packet(PACKET_SIZE, 0);
@@ -305,13 +306,91 @@ void KilobotOverheadController::chooseProgramFile() {
     }
 }
 
+void KilobotOverheadController::designController() {
+    controller_Folder = QFileDialog::QFileDialog::getExistingDirectory(nullptr, "Select Folder", "",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+    if (!controller_Folder.isEmpty())
+    {
+        qDebug() << "Final controller will be fetched from: " << controller_Folder;
+
+        int return_code;
+
+        return_code = system(("tar --strip-components=1 -xf ../src/TemplateForCompiling.tar -C " + controller_Folder.toStdString()).c_str());
+        return_code = system("cd ~/Nadzoru2; python3 main.py");
+    }
+    else
+    {
+        qDebug() << "No folder selected";
+
+    }
+}
+
+void KilobotOverheadController::compileController()
+{
+    if (!controller_Folder.isEmpty())
+    {
+        QString filename = QFileDialog::getOpenFileName((QWidget *) sender(), "Open Program File", controller_Folder, "C File (*.c)"); //launches File Selector
+
+        if (!filename.isEmpty())
+        {
+
+            QFileInfo fileInfo(filename.toStdString().c_str());
+
+            QString filename_without_extension = fileInfo.completeBaseName();
+
+            int return_code = system(("cd "+ controller_Folder.toStdString() + ";./compileCode.sh "+ filename_without_extension.toStdString()).c_str());
+
+            if (return_code == 0)
+            {
+                QMessageBox::information((QWidget *) sender(), "Kilobots Toolkit", "Compilation successful!");
+            }
+            else
+            {
+                QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "Compilation errors!");
+            }
+        }
+        else
+        {
+            QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "No folder selected");
+        }
+    }
+    else
+    {
+        QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "No controller folder selected yet, please use the Design controller button to do so!");
+    }
+}
+
+
 void KilobotOverheadController::uploadProgram() {
     if (sending) {
         this->stopSending();
         emit setStopButton(true);
     }
+
+    QSettings settings;
+    QString lastDir = settings.value("progLastDir", QDir::homePath()).toString();
+    QString filename = QFileDialog::getOpenFileName((QWidget *) sender(), "Open Program File", lastDir, "Program Hex File (*.hex)"); //launches File Selector
+    program_file = filename;
+    //upload_button->setEnabled(false);
+    if (!filename.isEmpty()) {
+        QFileInfo info(filename);
+        if (info.isReadable()) {
+//            ((QPushButton *)sender())->setText(info.fileName());
+            //if (connected)
+            //    upload_button->setEnabled(true);
+            QDir dirName (filename);
+            dirName.cdUp();
+            settings.setValue ("progLastDir", dirName.absolutePath());
+        }
+        else {
+            QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "Unable to open program file for reading.");
+            ((QPushButton *)sender())->setText("[select file]");
+            program_file = "";
+        }
+    }
+
     if (program_file.isEmpty()) {
-         QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "You must select a program file to upload.");
+        QMessageBox::critical((QWidget *) sender(), "Kilobots Toolkit", "You must select a program file to upload.");
     }
     else {
         // set to boot
@@ -349,8 +428,8 @@ void KilobotOverheadController::checkVoltage()
 
 //void KilobotOverheadController::setSerial()
 //{
-    //this->device = 2;
-    /*QVector<QString> ports = SerialConnection::enumerate();
+//this->device = 2;
+/*QVector<QString> ports = SerialConnection::enumerate();
     if (ports.size()>0) {
 
     }*/

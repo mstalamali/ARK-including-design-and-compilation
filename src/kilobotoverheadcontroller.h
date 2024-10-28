@@ -54,6 +54,9 @@ public slots:
     void chooseProgramFile();
     void uploadProgram();
 
+    // Nadzuro 2
+    void designController();
+    void compileController();
     // timed messages
     void sendBatch();
 
@@ -68,7 +71,7 @@ private:
     SerialConnection *serial_conn;
 
     QString serial_status;
-
+    QString controller_Folder="";
     QString program_file;
 
     // PRIVATE METHODS
